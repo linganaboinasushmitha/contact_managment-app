@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Management App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7f9;
+      padding: 40px;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    form {
+      background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 900px;
+      margin: 0 auto 40px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fff;
+    }
+    button {
+      padding: 10px 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .form-buttons {
+      grid-column: span 2;
+      text-align: center;
+    }
+    .form-buttons button {
+      margin: 0 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .actions button {
+      background-color: #28a745;
+      margin-right: 5px;
+    }
+    .actions button:nth-child(2) {
+      background-color: #dc3545;
+    }
+    .actions button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contact Management Application</h1>
+
+  <form id="contactForm">
+    <input type="text" id="firstName" placeholder="First Name" required />
+    <input type="text" id="lastName" placeholder="Last Name" required />
+    <input type="text" id="address" placeholder="Address" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    <div class="form-buttons">
+      <button type="submit">Save Contact</button>
+      <button type="button" onclick="clearForm()">Clear</button>
+    </div>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="contactTableBody"></tbody>
+  </table>
+
+  <script>
+    let contacts = JSON.parse(localStorage.getItem("contacts")) || [];
+    let editIndex = -1;
+
+    function renderTable() {
+      const tableBody = document.getElementById("contactTableBody");
+      tableBody.innerHTML = "";
+      contacts.forEach((contact, index) => {
+        const row = `<tr>
+          <td>${contact.firstName}</td>
+          <td>${contact.lastName}</td>
+          <td>${contact.address}</td>
+          <td>${contact.email}</td>
+          <td>${contact.phone}</td>
+          <td class="actions">
+            <button onclick="editContact(${index})">Edit</button>
+            <button onclick="deleteContact(${index})">Delete</button>
+          </td>
+        </tr>`;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    function clearForm() {
+      document.getElementById("contactForm").reset();
+      editIndex = -1;
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validatePhone(phone) {
+      return /^\d{10}$/.test(phone);
+    }
+
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!validateEmail(email)) {
+        alert("Please enter a valid email.");
+        return;
+      }
+      if (!validatePhone(phone)) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+      }
+
+      const duplicate = contacts.some((c, i) => i !== editIndex && (c.email === email || c.phone === phone));
+      if (duplicate) {
+        alert("Duplicate email or phone number found.");
+        return;
+      }
+
+      const newContact = { firstName, lastName, address, email, phone };
+
+      if (editIndex === -1) {
+        contacts.push(newContact);
+      } else {
+        contacts[editIndex] = newContact;
+        editIndex = -1;
+      }
+
+      localStorage.setItem("contacts", JSON.stringify(contacts));
+      renderTable();
+      clearForm();
+    });
+
+    function editContact(index) {
+      const contact = contacts[index];
+      document.getElementById("firstName").value = contact.firstName;
+      document.getElementById("lastName").value = contact.lastName;
+      document.getElementById("address").value = contact.address;
+      document.getElementById("email").value = contact.email;
+      document.getElementById("phone").value = contact.phone;
+      editIndex = index;
+    }
+
+    function deleteContact(index) {
+      if (confirm("Are you sure you want to delete this contact?")) {
+        contacts.splice(index, 1);
+        localStorage.setItem("contacts", JSON.stringify(contacts));
+        renderTable();
+      }
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
