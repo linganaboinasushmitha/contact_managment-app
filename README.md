@@ -19,24 +19,6 @@ Technology Stack
 - **Storage:** Browser localStorage API
 - **Validation:** Regex-based form validation for email and phone
 
-##  How to Use
-
-1. Download the project or clone the repository.
-2. Open the `index.html` file in your browser.
-3. Fill out the contact form and click **Save Contact**.
-4. View, update, or delete the saved records instantly.
-
-## Demo Instructions (for Submission)
-
-Record the following using OBS, Zoom, or Loom:
-
-1. Add a new contact
-2. Show contact added in the table
-3. Edit and update the contact
-4. Delete a contact
-5. Explain your tech stack choice and challenges faced
-
-> You can also include this README in your submission if required.
 
 ## 📁 Folder Structure
 
